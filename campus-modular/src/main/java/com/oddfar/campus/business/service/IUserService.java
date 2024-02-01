@@ -24,7 +24,7 @@ public interface IUserService {
      *
      * @return
      */
-    List<IUser> selectReservationUser();
+    List<IUser> selectReservationUserOrderByMinute();
 
     /**
      * 通过预约执行分钟查询预约用户列表

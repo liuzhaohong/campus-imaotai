@@ -1,14 +1,11 @@
 package com.oddfar.campus.business.service;
 
+import com.oddfar.campus.business.domain.UserCoinInfo;
 import com.oddfar.campus.business.entity.IUser;
 
+import java.util.List;
+
 public interface IMTService {
-    /**
-     * 获取i茅台app版本号
-     *
-     * @return
-     */
-    String getMTVersion();
 
     /**
      * 刷新i茅台app版本号
@@ -77,5 +74,10 @@ public interface IMTService {
      */
     void appointmentResults();
 
+    /**
+     * 获取I茅台用户的小茅运&体力值
+     */
+    List<UserCoinInfo> getUserCoin(Long[] mobiles);
 
+    void getRateAndPushPlus();
 }

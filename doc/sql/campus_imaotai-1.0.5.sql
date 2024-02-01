@@ -96,6 +96,21 @@ CREATE TABLE `i_user` (
                           PRIMARY KEY (`mobile`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci COMMENT='I茅台用户表';
 
+alter table i_user  add  user_agent  varchar(255)  null comment '用户代理' after device_id;
+alter table i_user  add  client_user_agent  varchar(50)  null comment '客户端用户代理' after device_id;
+
+DROP TABLE IF EXISTS `i_travel`;
+CREATE TABLE `i_travel` (
+                        `id` bigint NOT NULL COMMENT '主键',
+                        `mobile` bigint NOT NULL COMMENT 'I茅台手机号',
+                        `user_id` bigint DEFAULT NULL COMMENT 'I茅台用户id',
+                        `remark` varchar(255) DEFAULT NULL COMMENT '备注',
+                        `xmy_reward` decimal(4, 2) DEFAULT NULL COMMENT '旅行奖励',
+                        `postcard_id` varchar(50) DEFAULT NULL COMMENT '明信片编号',
+                        `postcard_name` varchar(50) DEFAULT NULL COMMENT '明信片名称',
+                        `create_time` datetime default CURRENT_TIMESTAMP not null COMMENT '创建时间',
+                        PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci COMMENT='I茅台旅行表';
 
 -- ----------------------------
 -- Table structure for sys_config

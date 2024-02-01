@@ -11,6 +11,7 @@ import com.oddfar.campus.common.domain.PageResult;
 import com.oddfar.campus.common.domain.R;
 import com.oddfar.campus.common.exception.ServiceException;
 import com.oddfar.campus.common.utils.StringUtils;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -21,6 +22,7 @@ import org.springframework.web.bind.annotation.*;
  * @author oddfar
  * @date 2023-07-06
  */
+@Slf4j
 @RestController
 @RequestMapping("/imt/user")
 @ApiResource(name = "I茅台用户Controller")
@@ -33,6 +35,8 @@ public class IUserController {
     private IMTService imtService;
     @Autowired
     private IShopService iShopService;
+
+    private static final String DEVICE_ID = "";
 
     /**
      * 查询I茅台用户列表
@@ -51,6 +55,10 @@ public class IUserController {
     @GetMapping(value = "/sendCode", name = "发送验证码")
     @PreAuthorize("@ss.resourceAuth()")
     public R sendCode(String mobile, String deviceId) {
+        log.info("sendCode,deviceId:{}", deviceId);
+        if (StringUtils.isNotEmpty(DEVICE_ID)) {
+            deviceId = DEVICE_ID;
+        }
         imtService.sendCode(mobile, deviceId);
 
         return R.ok();
@@ -95,6 +103,10 @@ public class IUserController {
     @GetMapping(value = "/login", name = "登录")
     @PreAuthorize("@ss.resourceAuth()")
     public R login(String mobile, String code, String deviceId) {
+        log.info("login,deviceId:{}", deviceId);
+        if (StringUtils.isNotEmpty(DEVICE_ID)) {
+            deviceId = DEVICE_ID;
+        }
         imtService.login(mobile, code, deviceId);
 
         return R.ok();
@@ -153,5 +165,14 @@ public class IUserController {
     @DeleteMapping(value = "/{mobiles}", name = "删除I茅台用户")
     public R remove(@PathVariable Long[] mobiles) {
         return R.ok(iUserMapper.deleteIUser(mobiles));
+    }
+
+    /**
+     * 实时获取I茅台用户的小茅运&体力值
+     */
+    @PreAuthorize("@ss.resourceAuth()")
+    @GetMapping(value = "/coin/{mobiles}", name = "获取I茅台用户详细信息")
+    public R getUserCoin(@PathVariable Long[] mobiles) {
+        return R.ok(imtService.getUserCoin(mobiles));
     }
 }

@@ -78,4 +78,12 @@ export function delUser(mobile) {
         url: '/imt/user/' + mobile,
         method: 'delete'
     })
+
+}
+
+export function getUserCoin(mobile) {
+  return request({
+    url: '/imt/user/coin/' + mobile,
+    method: 'get'
+  })
 }

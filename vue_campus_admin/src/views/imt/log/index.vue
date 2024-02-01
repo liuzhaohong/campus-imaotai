@@ -95,7 +95,11 @@
       @sort-change="handleSortChange"
     >
       <el-table-column type="selection" width="55" align="center" />
-      <el-table-column label="用户" align="center" prop="mobile" />
+      <el-table-column label="用户" align="center" prop="mobile" >
+        <template slot-scope="scope">
+          <span>{{ scope.row.mobile.toString().replace(/^(.{3})(?:\d+)(.{4})$/, "$1****$2") }}</span>
+        </template>
+      </el-table-column>
       <el-table-column
         label="日志记录内容"
         align="center"
@@ -154,6 +158,13 @@
       append-to-body
     >
       <el-form ref="form" :model="form" label-width="100px" size="mini">
+        <el-row>
+          <el-col :span="12">
+            <el-form-item label="用户：">
+              {{ form.mobile }}
+            </el-form-item>
+          </el-col>
+        </el-row>
         <el-row>
           <el-col :span="12">
             <el-form-item label="操作状态：">

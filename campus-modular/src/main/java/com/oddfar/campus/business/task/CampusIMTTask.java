@@ -23,22 +23,29 @@ public class CampusIMTTask {
     @Autowired
     private IUserService iUserService;
 
-
     /**
-     * 1：10 批量修改用户随机预约的时间
+     * 8:58、9:58、17:58 批量修改用户随机预约的时间
      */
     @Async
-    @Scheduled(cron = "0 10 1 ? * * ")
+    @Scheduled(cron = "0 58 8,9,17 ? * * ")
     public void updateUserMinuteBatch() {
         iUserService.updateUserMinuteBatch();
     }
 
-
     /**
-     * 11点期间，每分钟执行一次批量获得旅行奖励
+     * 8:55 推送比例
      */
     @Async
-    @Scheduled(cron = "0 0/1 11 ? * *")
+    @Scheduled(cron = "0 55 8 ? * * ")
+    public void getRateAndPushPlus() {
+        imtService.getRateAndPushPlus();
+    }
+
+    /**
+     * 10点期间，每分钟执行一次批量获得旅行奖励
+     */
+    @Async
+    @Scheduled(cron = "0 0/1 10 ? * *")
     public void getTravelRewardBatch() {
         imtService.getTravelRewardBatch();
 
@@ -56,23 +63,19 @@ public class CampusIMTTask {
 
 
     @Async
-    @Scheduled(cron = "0 10,55 7,8 ? * * ")
+    @Scheduled(cron = "0 28,51 8 ? * * ")
     public void refresh() {
         logger.info("「刷新数据」开始刷新版本号，预约item，门店shop列表  ");
-        try {
-            imtService.refreshAll();
-        } catch (Exception e) {
-            logger.info("「刷新数据执行报错」%s", e.getMessage());
-        }
+        imtService.refreshAll();
 
     }
 
 
     /**
-     * 18.05分获取申购结果
+     * 18点 每分钟获取申购结果
      */
     @Async
-    @Scheduled(cron = "0 5 18 ? * * ")
+    @Scheduled(cron = "0 0/1 18 ? * *")
     public void appointmentResults() {
         imtService.appointmentResults();
     }

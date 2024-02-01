@@ -15,14 +15,15 @@ import com.oddfar.campus.business.entity.IShop;
 import com.oddfar.campus.business.mapper.IItemMapper;
 import com.oddfar.campus.business.mapper.IShopMapper;
 import com.oddfar.campus.business.service.IShopService;
+import com.oddfar.campus.business.service.PushPlusService;
 import com.oddfar.campus.common.core.RedisCache;
 import com.oddfar.campus.common.exception.ServiceException;
 import com.oddfar.campus.common.utils.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
 import java.time.LocalDate;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
@@ -37,13 +38,16 @@ public class IShopServiceImpl extends ServiceImpl<IShopMapper, IShop> implements
 
     private static final Logger logger = LoggerFactory.getLogger(IShopServiceImpl.class);
 
-    @Autowired
+    @Resource
     IShopMapper iShopMapper;
-    @Autowired
+    @Resource
     IItemMapper iItemMapper;
 
-    @Autowired
+
+    @Resource
     RedisCache redisCache;
+    @Resource
+    private PushPlusService pushPlusService;
 
     @Override
     public List<IShop> selectShopList() {
@@ -65,30 +69,35 @@ public class IShopServiceImpl extends ServiceImpl<IShopMapper, IShop> implements
     //    @Async
     @Override
     public void refreshShop() {
+        try {
+            HttpRequest request = HttpUtil.createRequest(Method.GET,
+                    "https://static.moutai519.com.cn/mt-backend/xhr/front/mall/resource/get");
 
-        HttpRequest request = HttpUtil.createRequest(Method.GET,
-                "https://static.moutai519.com.cn/mt-backend/xhr/front/mall/resource/get");
+            JSONObject body = JSONObject.parseObject(request.execute().body());
+            //获取shop的url
+            String shopUrl = body.getJSONObject("data").getJSONObject("mtshops_pc").getString("url");
+            logger.info("shopUrl:{}", shopUrl);
+            //清空数据库
+            iShopMapper.truncateShop();
+            redisCache.deleteObject("mt_shop_list");
 
-        JSONObject body = JSONObject.parseObject(request.execute().body());
-        //获取shop的url
-        String shopUrl = body.getJSONObject("data").getJSONObject("mtshops_pc").getString("url");
-        //清空数据库
-        iShopMapper.truncateShop();
-        redisCache.deleteObject("mt_shop_list");
+            String s = HttpUtil.get(shopUrl);
 
-        String s = HttpUtil.get(shopUrl);
-
-        JSONObject jsonObject = JSONObject.parseObject(s);
-        Set<String> shopIdSet = jsonObject.keySet();
-        List<IShop> list = new ArrayList<>();
-        for (String iShopId : shopIdSet) {
-            JSONObject shop = jsonObject.getJSONObject(iShopId);
-            IShop iShop = new IShop(iShopId, shop);
+            JSONObject jsonObject = JSONObject.parseObject(s);
+            Set<String> shopIdSet = jsonObject.keySet();
+            List<IShop> list = new ArrayList<>();
+            for (String iShopId : shopIdSet) {
+                JSONObject shop = jsonObject.getJSONObject(iShopId);
+                IShop iShop = new IShop(iShopId, shop);
 //            iShopMapper.insert(iShop);
-            list.add(iShop);
+                list.add(iShop);
+            }
+            this.saveBatch(list);
+            redisCache.setCacheList("mt_shop_list", list);
+        } catch (Exception e) {
+            logger.error("refreshShop异常：{}", e.getMessage(), e);
+            pushPlusService.sendNotice("refreshShop", e.getMessage());
         }
-        this.saveBatch(list);
-        redisCache.setCacheList("mt_shop_list", list);
     }
 
     @Override
@@ -101,6 +110,7 @@ public class IShopServiceImpl extends ServiceImpl<IShopMapper, IShop> implements
         }
 
         String res = HttpUtil.get("https://static.moutai519.com.cn/mt-backend/xhr/front/mall/index/session/get/" + dayTime);
+        logger.info("getCurrentSessionId：{}", res);
         //替换 current_session_id 673 ['data']['sessionId']
         JSONObject jsonObject = JSONObject.parseObject(res);
 
@@ -126,8 +136,14 @@ public class IShopServiceImpl extends ServiceImpl<IShopMapper, IShop> implements
 
     @Override
     public void refreshItem() {
-        redisCache.deleteObject("mt_session_id");
-        getCurrentSessionId();
+        try {
+            redisCache.deleteObject("mt_session_id");
+            getCurrentSessionId();
+        } catch (Exception e) {
+            logger.info("refreshItem异常：{}", e.getMessage(), e);
+            pushPlusService.sendNotice("refreshItem", e.getMessage());
+
+        }
     }
 
     @Override

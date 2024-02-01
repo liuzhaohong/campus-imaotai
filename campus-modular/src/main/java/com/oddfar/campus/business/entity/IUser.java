@@ -52,6 +52,16 @@ public class IUser extends BaseEntity {
     private String deviceId;
 
     /**
+     * 用户代理
+     */
+    private String userAgent;
+
+    /**
+     * 客户端用户代理
+     */
+    private String clientUserAgent;
+
+    /**
      * 商品预约code，用@间隔
      */
     private String itemCode;
@@ -154,11 +164,11 @@ public class IUser extends BaseEntity {
         this.mobile = mobile;
         this.token = data.getString("token");
         this.cookie = data.getString("cookie");
-        this.deviceId = deviceId.toLowerCase();
+        this.deviceId = deviceId;
         this.jsonResult = StringUtils.substring(jsonObject.toJSONString(), 0, 2000);
 
         if (StringUtils.isEmpty(this.remark)) {
-            this.remark = data.getString("userName");
+            this.remark = data.getString("userName") + mobile.toString().substring(7);
         }
 
         Calendar calendar = Calendar.getInstance();

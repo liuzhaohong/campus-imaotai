@@ -131,7 +131,18 @@
         </el-button
         >
       </el-col>
-
+      <el-col :span="1.5">
+        <el-button
+          type="primary"
+          plain
+          icon="el-icon-magic-stick"
+          size="mini"
+          :disabled="multiple"
+          @click="queryUserCoin"
+        >查询用户小茅运&体力值
+        </el-button
+        >
+      </el-col>
       <right-toolbar
         :showSearch.sync="showSearch"
         @queryTable="getList"
@@ -211,7 +222,11 @@
       </el-table-column>
 
       <el-table-column type="selection" width="55" align="center"/>
-      <el-table-column label="手机号" align="center" prop="mobile"/>
+      <el-table-column label="手机号" align="center" prop="mobile" >
+        <template slot-scope="scope">
+          <span>{{ scope.row.mobile.toString().replace(/^(.{3})(?:\d+)(.{4})$/, "$1****$2") }}</span>
+        </template>
+      </el-table-column>
       <el-table-column label="备注" align="center" prop="remark"/>
       <el-table-column label="预约项目code" align="center" prop="itemCode"/>
       <el-table-column label="省份" align="center" prop="provinceName"/>
@@ -283,8 +298,14 @@
             icon="el-icon-delete"
             @click="handleDelete(scope.row)"
           >删除
-          </el-button
-          >
+          </el-button>
+          <el-button
+            size="mini"
+            type="text"
+            icon="el-icon-magic-stick"
+            @click="queryUserCoin(scope.row)"
+          >查小茅运&体力值
+          </el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -518,6 +539,7 @@
         <el-button @click="cancel">取 消</el-button>
       </div>
     </el-dialog>
+    <UserCoinQuery ref="userCoinQuery"/>
   </div>
 </template>
 
@@ -535,10 +557,14 @@ import {
 } from "@/api/imt/user";
 
 import {listItem} from "@/api/imt/item";
+import UserCoinQuery from "@/components/UserCoin/Query.vue";
 
 export default {
   name: "User",
   dicts: ["sys_normal_disable"],
+  components: {
+    UserCoinQuery,
+  },
   data() {
     return {
       // 遮罩层
@@ -802,6 +828,11 @@ export default {
         })
         .catch(() => {
         });
+    },
+    /** 查询用户小茅运&体力值 */
+    queryUserCoin(row) {
+      const mobiles = row.mobile || this.ids;
+      this.$refs.userCoinQuery.queryUserCoin(mobiles)
     },
     refresh(mobile, code, deviceId, status) {
       const msg = status ? "刷新成功" : "登录成功";

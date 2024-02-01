@@ -40,13 +40,14 @@ public interface IUserMapper extends BaseMapperX<IUser> {
 
     }
 
-    default List<IUser> selectReservationUser() {
+    default List<IUser> selectReservationUserOrderByMinute() {
         return selectList(new LambdaQueryWrapperX<IUser>()
 //                      .gt(IUser::getExpireTime, new Date())
                         .ne(IUser::getLat, "")
                         .ne(IUser::getLng, "")
                         .ne(IUser::getItemCode, "")
                         .isNotNull(IUser::getItemCode)
+                        .orderByAsc(IUser::getMinute)
 
         );
 
@@ -66,7 +67,8 @@ public interface IUserMapper extends BaseMapperX<IUser> {
         );
     }
 
-    @Select("UPDATE i_user SET `minute` = (SELECT FLOOR(RAND() * 50 + 1)) WHERE random_minute = \"0\"")
+    // 生成随机数，1<=随机数<=30
+    @Select("UPDATE i_user SET `minute` = (SELECT FLOOR(RAND() * 30 + 1)) WHERE random_minute = \"0\"")
     void updateUserMinuteBatch();
 
     int deleteIUser(Long[] iUserId);

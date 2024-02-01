@@ -33,7 +33,7 @@ public class IMTLogFactory {
 
         AsyncManager.me().execute(recordOper(operLog));
         //推送
-        PushPlusApi.sendNotice(iUser, operLog);
+//        PushPlusApi.sendNotice(iUser, operLog);
     }
 
     /**

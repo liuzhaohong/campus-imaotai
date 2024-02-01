@@ -55,8 +55,8 @@ public class IUserServiceImpl implements IUserService {
     }
 
     @Override
-    public List<IUser> selectReservationUser() {
-        return iUserMapper.selectReservationUser();
+    public List<IUser> selectReservationUserOrderByMinute() {
+        return iUserMapper.selectReservationUserOrderByMinute();
 
     }
 
