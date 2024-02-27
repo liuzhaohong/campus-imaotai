@@ -16,6 +16,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.Resource;
+
 /**
  * I茅台用户Controller
  *
@@ -29,7 +31,7 @@ import org.springframework.web.bind.annotation.*;
 public class IUserController {
     @Autowired
     private IUserService iUserService;
-    @Autowired
+    @Resource
     private IUserMapper iUserMapper;
     @Autowired
     private IMTService imtService;
@@ -163,8 +165,8 @@ public class IUserController {
      */
     @PreAuthorize("@ss.resourceAuth()")
     @DeleteMapping(value = "/{mobiles}", name = "删除I茅台用户")
-    public R remove(@PathVariable Long[] mobiles) {
-        return R.ok(iUserMapper.deleteIUser(mobiles));
+    public R remove(@PathVariable Long mobiles) {
+        return R.ok(iUserMapper.logicRemoveUser(mobiles));
     }
 
     /**

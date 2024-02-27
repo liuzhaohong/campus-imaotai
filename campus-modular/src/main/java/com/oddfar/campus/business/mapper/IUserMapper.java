@@ -4,7 +4,9 @@ import com.oddfar.campus.business.entity.IUser;
 import com.oddfar.campus.common.core.BaseMapperX;
 import com.oddfar.campus.common.core.LambdaQueryWrapperX;
 import com.oddfar.campus.common.domain.PageResult;
+import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.Update;
 
 import java.util.List;
 
@@ -64,6 +66,7 @@ public interface IUserMapper extends BaseMapperX<IUser> {
                         .ne(IUser::getLng, "")
                         .ne(IUser::getItemCode, "")
                         .isNotNull(IUser::getItemCode)
+                        .eq(IUser::getDelFlag, false)
         );
     }
 
@@ -72,4 +75,7 @@ public interface IUserMapper extends BaseMapperX<IUser> {
     void updateUserMinuteBatch();
 
     int deleteIUser(Long[] iUserId);
+
+    @Update("UPDATE i_user SET `del_flag` = true WHERE mobile = ${mobiles}")
+    int logicRemoveUser(@Param("mobiles") Long mobiles);
 }

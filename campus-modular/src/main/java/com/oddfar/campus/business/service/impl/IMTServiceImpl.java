@@ -723,7 +723,7 @@ public class IMTServiceImpl extends IMTServiceBase implements IMTService {
             userCoinInfo.setXmyNum(data.getFloat("xmyNum"));
             userCoinInfo.setEnergy(data.getInteger("energy"));
         }catch (Exception e){
-            logger.error("查询小茅运&体力值失败:user->{},失败原因->{}",iUser.getMobile(), e.getMessage());
+            logger.error("查询小茅运&体力值失败:user->{},失败原因->{}",iUser.getRemark(), e.getMessage());
         }
         return userCoinInfo;
     }

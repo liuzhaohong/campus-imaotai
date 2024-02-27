@@ -6,6 +6,10 @@ MAINTAINER oddfar
 # 创建目录
 RUN mkdir -p /home/campus/conf
 
+#JVM时区设置
+RUN /bin/cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
+&& echo 'Asia/Shanghai' >/etc/timezone \
+
 WORKDIR /home/campus
 
 ENV SERVER_PORT=8160
